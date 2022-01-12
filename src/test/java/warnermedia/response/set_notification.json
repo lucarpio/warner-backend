@@ -1,0 +1,8 @@
+{
+    "idRequest": #number,
+    "contentID": "#string",
+    "statusID": #number,
+    "statusDescription": "#string",
+    "requestedDate": "#string",
+    "statusDate": "#string"
+}

@@ -1,0 +1,50 @@
+trigger:
+- none
+
+jobs:
+- job: localTest
+  steps:
+    - script: mvn clean verify -Dkarate.env=qa -Dkarate.options="--tags @run"
+      displayName: 'Run tests'
+
+    - task: ArchiveFiles@2
+      displayName: 'Compress Karate Report'
+      condition: always()
+      inputs:
+        rootFolderOrFile: 'target/surefire-reports/'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: 'target/karate-report.zip'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Karate Report'
+      condition: always()
+      inputs:
+        targetPath: 'target/karate-report.zip'
+        artifactName: karate-report
+
+    - task: ArchiveFiles@2
+      displayName: 'Compress Cucumber Report'
+      condition: always()
+      inputs:
+        rootFolderOrFile: 'target/cucumber-html-reports/'
+        includeRootFolder: true
+        archiveType: 'zip'
+        archiveFile: 'target/cucumber-html-report.zip'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Cucumber Report'
+      condition: always()
+      inputs:
+        targetPath: 'target/cucumber-html-report.zip'
+        artifactName: cucumber-report
+
+    - task: PublishTestResults@2
+      displayName: 'JUnit Report'
+      condition: always()
+      inputs:
+        testResultsFormat: "JUnit"
+        testResultsFiles: "warnermedia*.xml"
+        searchFolder: "./target/surefire-reports/"
+        failTaskOnFailedTests: true
+
